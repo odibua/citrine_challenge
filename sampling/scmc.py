@@ -3,8 +3,8 @@ from smt.sampling_methods import LHS
 from typing import List
 
 
-class run_scmc:
-    def __init__(self, N: int, bounds: np.Array, constraints: List = None):
+class constrained_scmc:
+    def __init__(self, N: int, bounds: np.Array, constraints: List, tau_T: float):
         """
         Initialize scmc class with relevant parameters and constraints
         :param N: Number of samples to be generated
@@ -19,6 +19,11 @@ class run_scmc:
         # Initialize candidate points
         sampling = LHS(xlimits=bounds)
         self.x = sampling(N)
+
+        # Save initial constant and goal constant to state
+        self.tau_t = 0
+        self.tau_T = tau_T
+
 
 
 
