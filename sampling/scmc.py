@@ -1,8 +1,9 @@
 import numpy as np
 from random import choices
+from scipy.optimize import optimize
 from scipy.stats import norm
 from smt.sampling_methods import LHS
-from typing import List, Callable
+from typing import Callable, List
 
 
 class constrained_scmc:
@@ -24,23 +25,30 @@ class constrained_scmc:
         self.x = sampling(N)
 
         # Save initial constant and goal constant to state
+        self.tau_t = 0
         self.tau_T = tau_T
 
         # Initialize normal cdf with variance of 1
         self.norm_cdf = norm.cdf
         self.scale = 1.0
 
+        # Initialize desired Effective Sample Size
+        self.ess = 0.5*N
 
-    def modify_weights(self, tau_t_1: float, tau_t: float):
+
+    def modify_weights(self):
         """
         Modify the weights at time step t based on constraints and current candidate
         :param tau_t: Current value of tau
         :param tau_t_1:  Previous value of tau
         :return:
         """
+        #
 
         # Calculate wns used to modify weights
-        self.calc_wn(tau_t_1, tau_t)
+        calc_wn = self.outer_calc_wn(self.norm_cdf, self.x, self.w, self.constraints, self.tau_t, self.scale)
+        self.tau_t =  self.get_tau_t(calc_wn, self.tau_t)
+        self.w = calc_wn(self.tau_t)
 
         #M Modify weights
         norm_constant = 0
@@ -49,16 +57,29 @@ class constrained_scmc:
             norm_constant = norm_constant + self.W[idx]
         self.W = self.W/norm_constant
 
-    def calc_wn(self, tau_t_1: float, tau_t: float):
+    @staticmethod
+    def outer_calc_wn(norm_cdf: Callable, x: np.Array[np.Array[float]], w: np.Array[Float], constraints: List[Callable], tau_t_1: float, scale: float = 1.0):
         """
         Calculate wn which is used to modify weights for resampling, and adaptively determine tau_t
-        :param tau_t: Current value of tau
+        :param norm_cdf: CDF of normal distribution function
+        :param x: Array of x candidate points
+        :param constraints: List of constraint evaluations
         :param tau_t_1:  Previous value of tau
+        :return calc_wn function that takes as an argument tau_t
         """
-        for idx, _x in enumerate(self.x):
-            num = np.prod(self.norm_cdf(-tau_t*self.constraints))
-            den = np.prod(self.norm_cdf(-tau_t_1*self.constraints.eval_constraints(_x)))
-            self.w[idx] = num/den
+        def calc_wn(tau_t):
+            for idx, _x in enumerate(x):
+                num = np.prod(norm_cdf(-tau_t*constraints(_x), scale=scale))
+                den = np.prod(norm_cdf(-tau_t_1*constraints(_x), scale=scale))
+                w[idx] = num/den
+            return w
+        return calc_wn
+
+    @staticmethod
+    def get_tau_t(calc_wn: Callable, tau_t: float):
+        F = lambda tau_t: sum(calc_wn(tau_t))**2/sum(calc_wn(tau_t)**2) - self.ess
+        return optimize.broyden(F, tau_t)
+
 
     # TODO: Make part of run_scmc class
     def resample_candidates(self):
