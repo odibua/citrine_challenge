@@ -29,27 +29,33 @@ class constrained_scmc:
         self.norm_cdf = norm.cdf
         self.scale = 1.0
 
-    def modify_weights(self, tau_t: float):
+    def modify_weights(self, tau_t_1: float, tau_t: float):
         """
         Modify the weights at time step t based on constraints and current candidate
-        :param tau:
-        :return:
-        """
-        pass
-
-
-    def calc_wn(self, x: np.Array[float], tau_t: float, tau_t_1: float, constraints: List[Callable]):
-        """
-        Calculate wn which is used to modify weights for resampling, and adaptively determine tau_t
-        :param x: Array of sampled points for which wns will be calculated
         :param tau_t: Current value of tau
         :param tau_t_1:  Previous value of tau
-        :param constraints: List of constraint evaluations
+        :return:
         """
-        for idx, _x in enumerate(x):
-            num = np.prod(self.norm_cdf(-tau_t*constraints))
-            den = np.prod(self.norm_cdf(-tau_t_1*constraints.eval_constraints()))
+
+        # Calculate wns used to modify weights
+        self.calc_wn(tau_t_1, tau_t)
+
+        #M Modify weights
+        for idx, W in enumerate(self.W):
+            self.W[idx] = W*self.w[idx]
+
+
+    def calc_wn(self, tau_t_1: float, tau_t: float):
+        """
+        Calculate wn which is used to modify weights for resampling, and adaptively determine tau_t
+        :param tau_t: Current value of tau
+        :param tau_t_1:  Previous value of tau
+        """
+        for idx, _x in enumerate(self.x):
+            num = np.prod(self.norm_cdf(-tau_t*self.constraints))
+            den = np.prod(self.norm_cdf(-tau_t_1*self.constraints.eval_constraints(_x)))
             self.w[idx] = num/den
+
 
 
 
