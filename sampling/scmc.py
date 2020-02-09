@@ -16,7 +16,7 @@ class constrained_scmc:
         # Initialize constraints and weights
         self.N = N
         self.constraints = constraints
-        self.W = np.array([1.0/N]*N)
+        self.W = self.init_weights(N)
         self.w = np.array([0.0]*N)
 
         # Initialize candidate points
@@ -49,14 +49,6 @@ class constrained_scmc:
             norm_constant = norm_constant + self.W[idx]
         self.W = self.W/norm_constant
 
-    def resample_candidates(self):
-        """
-        Resample from candidate points based on updated weights
-        :return:
-        """
-        self.x = np.array(choices(population=self.x, weights=self.W, k=self.N))
-
-
     def calc_wn(self, tau_t_1: float, tau_t: float):
         """
         Calculate wn which is used to modify weights for resampling, and adaptively determine tau_t
@@ -67,6 +59,25 @@ class constrained_scmc:
             num = np.prod(self.norm_cdf(-tau_t*self.constraints))
             den = np.prod(self.norm_cdf(-tau_t_1*self.constraints.eval_constraints(_x)))
             self.w[idx] = num/den
+
+    # TODO: Make part of run_scmc class
+    def resample_candidates(self):
+        """
+        Resample from candidate points based on updated weights
+        :return:
+        """
+        self.x = np.array(choices(population=self.x, weights=self.W, k=self.N))
+
+    @staticmethod
+    def init_weights(N: int) -> np.Array[float]:
+        """
+        Initialize weights to be uniform in number of candidae points
+        :param N: Number of candidate poins
+        :return:
+        """
+        return np.array([[1.0/N]*N])
+
+
 
 
 
