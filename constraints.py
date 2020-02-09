@@ -45,7 +45,7 @@ class Constraint():
                  return False
         return eval(expr)
 
-    def eval_constraints(self, x: List[float]) -> List[float]:
+    def eval_constraints(self, x: np.Array[float]) -> np.Array[float]:
         """
         Evaluate g(x) for each g(x) >= 0 constraint, returning the values of every evaluation as a list
         :param x: list on which to evaluate g(x)
@@ -54,4 +54,4 @@ class Constraint():
         results = []
         for num_expr in self.num_exprs:
             results.append(eval(num_expr))
-        return results
+        return np.array(results)
