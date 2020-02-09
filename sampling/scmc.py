@@ -12,12 +12,12 @@ class constrained_scmc:
         Initialize scmc class with relevant parameters and constraints
         :param N: Number of samples to be generated
         :param bounds: Lower and upper bounds of hypercube in each dimension
-        :param constraints: List of constraint evaluations
+        :param constraints: List of constraint that define valid regions of the hypercube
         """
         # Initialize constraints and weights
         self.N = N
         self.constraints = constraints
-        self.W = self.init_weights(N)
+        self.init_weights(N)
         self.w = np.array([0.0]*N)
 
         # Initialize candidate points
@@ -80,7 +80,6 @@ class constrained_scmc:
         F = lambda tau_t: sum(calc_wn(tau_t))**2/sum(calc_wn(tau_t)**2) - self.ess
         return optimize.broyden(F, tau_t)
 
-
     # TODO: Make part of run_scmc class
     def resample_candidates(self):
         """
@@ -89,14 +88,22 @@ class constrained_scmc:
         """
         self.x = np.array(choices(population=self.x, weights=self.W, k=self.N))
 
-    @staticmethod
-    def init_weights(N: int) -> np.Array[float]:
+    def stop(self) -> int:
+        """
+        States whether stopping condition of tau_t>=tau_T has been reached
+        :return: Booleam
+        """
+        if self.tau_t>=self.tau_T:
+            return True
+        return False
+
+    def init_weights(self, N: int) -> np.Array[float]:
         """
         Initialize weights to be uniform in number of candidae points
         :param N: Number of candidate poins
         :return:
         """
-        return np.array([[1.0/N]*N])
+        self.W = np.array([[1.0/N]*N])
 
 
 
