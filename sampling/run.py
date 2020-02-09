@@ -26,9 +26,9 @@ class run_scmc:
             scmc.modify_weights()
             scmc.resample_candidates()
             scmc.init_weights()
-            x, pi = scmc.x, scmc.pi
+            x, pi = scmc.x, scmc.get_pi()
             mh = metropolis_hastings(x, pi)
-            scmc.x = metropolis_hastings.gibbs_type()
+            scmc.x = mh.gibbs_type()
 
         return scmc.x
 

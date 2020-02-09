@@ -35,7 +35,6 @@ class constrained_scmc:
         # Initialize desired Effective Sample Size
         self.ess = 0.5*N
 
-
     def modify_weights(self):
         """
         Modify the weights at time step t based on constraints and current candidate
@@ -75,11 +74,6 @@ class constrained_scmc:
             return w
         return calc_wn
 
-    @staticmethod
-    def get_tau_t(calc_wn: Callable, tau_t: float):
-        F = lambda tau_t: sum(calc_wn(tau_t))**2/sum(calc_wn(tau_t)**2) - self.ess
-        return optimize.broyden(F, tau_t)
-
     # TODO: Make part of run_scmc class
     def resample_candidates(self):
         """
@@ -104,6 +98,18 @@ class constrained_scmc:
         :return:
         """
         self.W = np.array([[1.0/N]*N])
+
+    @staticmethod
+    def get_tau_t(calc_wn: Callable, tau_t: float):
+        F = lambda tau_t: sum(calc_wn(tau_t))**2/sum(calc_wn(tau_t)**2) - self.ess
+        return optimize.broyden(F, tau_t)
+
+    def get_pi(self):
+        def target_distrib(tau_t, constraints):
+            def pi(x):
+                return np.prod(norm_cdf(-tau_t * constraints(_x), scale=scale))
+            return pi
+        return target_distrib(self.tau_t, self.constraints)
 
 
 
