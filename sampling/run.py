@@ -1,9 +1,10 @@
-from sampling.metropolis_hastings import metropolis_hastings
-from sampling.scmc import constrained_scmc
+from sampling.metropolis_hastings import MetropolisHastings
+from sampling.scmc import ConstrainedSCMC
+import numpy as np
 from typing import Callable, List
 
-class run_scmc:
-    def __init__(self, N: int, bounds: np.Array[float], type: str, tau_T: float = None, constraints: List[Callable] = None):
+class RunSCMC:
+    def __init__(self, N: int, bounds: np.ndarray, scmc_type: str, tau_T: float = None, constraints: List[Callable] = None):
         """
         Run SCMC sampling methods based on user input
         :param N: Number of points to be sampled
@@ -14,20 +15,20 @@ class run_scmc:
         """
 
         types = ["constrained_scmc"]
-        if type not in types:
+        if scmc_type not in types:
             raise ValueError('Invalid SCMC type try one of {t}.'.format(t=types))
 
-        if type=="constrained_scmc":
+        if scmc_type=="constrained_scmc":
             if not constraints:
                 raise ValueError('No constraints specified for Constrained SCMC. Specify constraints as list of functions')
-            scmc = constrained_scmc(N, bounds, constraints, tau_T)
+            scmc = ConstrainedSCMC(N, bounds, constraints, tau_T)
 
         while not scmc.stop():
             scmc.modify_weights()
             scmc.resample_candidates()
             scmc.init_weights()
             x, pi = scmc.x, scmc.get_pi()
-            mh = metropolis_hastings(x, pi)
+            mh = MetropolisHastings(x, pi)
             scmc.x = mh.gibbs_type()
 
         return scmc.x

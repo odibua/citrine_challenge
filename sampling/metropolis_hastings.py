@@ -5,8 +5,8 @@ from typing import Callable
 norm_rvs = norm.rvs
 norm_pdf = norm.pdf
 
-class metropolis_hastings:
-    def __init__(self, x: np.array[np.Array[float]], pi: Callable,  T: int = 5, proposal_distrib: Callable = norm_pdf, trans_kern: Callable = norm_rvs, loc: float = 0.0, scale: float = 1.0):
+class MetropolisHastings:
+    def __init__(self, x: np.ndarray, pi: Callable,  T: int = 5, proposal_distrib: Callable = norm_pdf, trans_kern: Callable = norm_rvs, loc: float = 0.0, scale: float = 1.0):
         """
         Initialize basic parameters used for metropolis hastings
         :param x: Initial vector from which new samples will be generated

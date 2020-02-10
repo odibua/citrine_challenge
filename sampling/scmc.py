@@ -6,8 +6,8 @@ from smt.sampling_methods import LHS
 from typing import Callable, List
 
 
-class constrained_scmc:
-    def __init__(self, N: int, bounds: np.Array[float], constraints: List[Callable], tau_T: float):
+class ConstrainedSCMC:
+    def __init__(self, N: int, bounds: np.ndarray, constraints: List[Callable], tau_T: float):
         """
         Initialize scmc class with relevant parameters and constraints
         :param N: Number of samples to be generated
@@ -57,7 +57,7 @@ class constrained_scmc:
         self.W = self.W/norm_constant
 
     @staticmethod
-    def outer_calc_wn(norm_cdf: Callable, x: np.Array[np.Array[float]], w: np.Array[Float], constraints: List[Callable], tau_t_1: float, scale: float = 1.0):
+    def outer_calc_wn(norm_cdf: Callable, x: np.ndarray, w: np.ndarray, constraints: List[Callable], tau_t_1: float, scale: float = 1.0):
         """
         Calculate wn which is used to modify weights for resampling, and adaptively determine tau_t
         :param norm_cdf: CDF of normal distribution function
@@ -91,7 +91,7 @@ class constrained_scmc:
             return True
         return False
 
-    def init_weights(self, N: int) -> np.Array[float]:
+    def init_weights(self, N: int) -> np.ndarray:
         """
         Initialize weights to be uniform in number of candidae points
         :param N: Number of candidate poins
