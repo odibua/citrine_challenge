@@ -1,6 +1,6 @@
 import numpy as np
 from random import choices
-from scipy.optimize import optimize
+from scipy import optimize
 from scipy.stats import norm
 from smt.sampling_methods import LHS
 from typing import Callable, List
@@ -46,7 +46,7 @@ class ConstrainedSCMC:
 
         # Calculate wns used to modify weights
         calc_wn = self.outer_calc_wn(self.norm_cdf, self.x, self.w, self.constraints, self.tau_t, self.scale)
-        self.tau_t =  self.get_tau_t(calc_wn, self.tau_t)
+        self.tau_t =  self.get_tau_t(calc_wn=calc_wn, tau_t=self.tau_t+1e-3, ess=self.ess)
         self.w = calc_wn(self.tau_t)
 
         #M Modify weights
@@ -80,6 +80,8 @@ class ConstrainedSCMC:
         Resample from candidate points based on updated weights
         :return:
         """
+        # import ipdb
+        # ipdb.set_trace()
         self.x = np.array(choices(population=self.x, weights=self.W, k=self.N))
 
     def stop(self) -> int:
@@ -97,19 +99,21 @@ class ConstrainedSCMC:
         :param N: Number of candidate poins
         :return:
         """
-        self.W = np.array([[1.0/N]*N])
+        self.W = np.array([1.0/N]*N)
 
     @staticmethod
-    def get_tau_t(calc_wn: Callable, tau_t: float):
-        F = lambda tau_t: sum(calc_wn(tau_t))**2/sum(calc_wn(tau_t)**2) - self.ess
-        return optimize.broyden(F, tau_t)
+    def get_tau_t(calc_wn: Callable, tau_t: float, ess: float):
+        # F = lambda tau_t: np.exp(np.log(sum(calc_wn(tau_t))**2) - np.log(sum(calc_wn(tau_t)**2))) - ess
+        F = lambda tau_t: sum(calc_wn(tau_t)) ** 2/(sum(calc_wn(tau_t) ** 2)) - ess
+        tau = optimize.fsolve(F, tau_t)
+        return tau
 
-    def get_pi(self):
-        def target_distrib(tau_t, constraints):
-            def pi(x):
-                return np.prod(norm_cdf(-tau_t * constraints(_x), scale=scale))
+    def get_pi(self) -> Callable:
+        def target_distrib(tau_t: float, constraints: List[Callable], scale: float, norm_cdf: Callable) -> Callable:
+            def pi(x: np.ndarray) -> float:
+                return np.exp(np.sum(np.log(norm_cdf(-tau_t * constraints(x), scale=scale))))
             return pi
-        return target_distrib(self.tau_t, self.constraints)
+        return target_distrib(self.tau_t, self.constraints, scale=self.scale, norm_cdf=self.norm_cdf)
 
 
 

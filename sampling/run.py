@@ -21,15 +21,22 @@ class RunSMC:
         if scmc_type=="constrained_scmc":
             if not constraints:
                 raise ValueError('No constraints specified for Constrained SCMC. Specify constraints as list of functions')
+            if not tau_T:
+                raise ValueError('No constraint parameter value tau_T specified')
             scmc = ConstrainedSCMC(N, bounds, constraints, tau_T)
 
+        t=0
         while not scmc.stop():
+            print(t)
+            import ipdb
+            ipdb.set_trace()
             scmc.modify_weights()
             scmc.resample_candidates()
-            scmc.init_weights()
+            scmc.init_weights(N)
             x, pi = scmc.x, scmc.get_pi()
             mh = MetropolisHastings(x, pi)
             scmc.x = mh.gibbs_type()
+            t=t+1
 
         return scmc.x
 

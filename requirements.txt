@@ -2,3 +2,4 @@ numpy
 typing
 scipy
 smt
+ipdb

@@ -6,7 +6,7 @@ norm_rvs = norm.rvs
 norm_pdf = norm.pdf
 
 class MetropolisHastings:
-    def __init__(self, x: np.ndarray, pi: Callable,  T: int = 5, proposal_distrib: Callable = norm_pdf, trans_kern: Callable = norm_rvs, loc: float = 0.0, scale: float = 1.0):
+    def __init__(self, x: np.ndarray, pi: Callable,  T: int = 10, proposal_distrib: Callable = norm_pdf, trans_kern: Callable = norm_rvs, loc: float = 0.0, scale: float = 1.0):
         """
         Initialize basic parameters used for metropolis hastings
         :param x: Initial vector from which new samples will be generated
@@ -17,7 +17,7 @@ class MetropolisHastings:
         :param scale: Standard deviation of transition kernel
         """
 
-        self. x = [x] if len(x.shape)==2 else x
+        self. x = [x] if len(x.shape)==1 else x
         self.pi = pi
         self.trans_kern = trans_kern
         self.T = T
@@ -37,9 +37,10 @@ class MetropolisHastings:
         """
         self.proposal_distrib = proposal_distrib if proposal_distrib else self.proposal_distrib
         self.trans_kern = trans_kern if trans_kern else self.trans_kern
-
-        for t in range(T):
-            for idx, _x in enumerate(range(self.x)):
+        # import ipdb
+        # ipdb.set_trace()
+        for t in range(self.T):
+            for idx, _x in enumerate(self.x):
                 for idx2, _xi in enumerate(_x):
                     _xi_0, _x_temp = _xi, _x
                     proposed_xi = _xi_0 + self.trans_kern(loc=self.loc, scale=self.scale)
