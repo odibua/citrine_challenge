@@ -68,10 +68,10 @@ class ConstrainedSCMC:
         """
         def calc_wn(tau_t):
             for idx, _x in enumerate(x):
-                num = np.prod(norm_cdf(-tau_t*constraints(_x), scale=scale))
-                den = np.prod(norm_cdf(-tau_t_1*constraints(_x), scale=scale))
-                w[idx] = num/den
-            return w
+                num = np.sum(np.log(norm_cdf(-tau_t*constraints(_x), scale=scale)))
+                den = np.sum(np.log(norm_cdf(-tau_t_1*constraints(_x), scale=scale)))
+                w[idx] = num - den
+            return np.exp(w)
         return calc_wn
 
     # TODO: Make part of run_scmc class

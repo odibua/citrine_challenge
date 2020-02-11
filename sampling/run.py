@@ -3,7 +3,7 @@ from sampling.scmc import ConstrainedSCMC
 import numpy as np
 from typing import Callable, List
 
-class RunSCMC:
+class RunSMC:
     def __init__(self, N: int, bounds: np.ndarray, scmc_type: str, tau_T: float = None, constraints: List[Callable] = None):
         """
         Run SCMC sampling methods based on user input
