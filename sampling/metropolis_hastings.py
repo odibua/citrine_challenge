@@ -1,3 +1,5 @@
+####################Python packages#####################
+import copy
 import numpy as np
 from scipy.stats import norm, uniform
 from typing import Callable
@@ -6,7 +8,7 @@ norm_rvs = norm.rvs
 norm_pdf = norm.pdf
 
 class MetropolisHastings:
-    def __init__(self, x: np.ndarray, pi: Callable,  T: int = 10, proposal_distrib: Callable = norm_pdf, trans_kern: Callable = norm_rvs, loc: float = 0.0, scale: float = 1.0):
+    def __init__(self, x: np.ndarray, pi: Callable,  T: int = 1, proposal_distrib: Callable = norm_pdf, trans_kern: Callable = norm_rvs, loc: float = 0.0, scale: float = 1.0):
         """
         Initialize basic parameters used for metropolis hastings
         :param x: Initial vector from which new samples will be generated
@@ -42,7 +44,7 @@ class MetropolisHastings:
         for t in range(self.T):
             for idx, _x in enumerate(self.x):
                 for idx2, _xi in enumerate(_x):
-                    _xi_0, _x_temp = _xi, _x
+                    _xi_0, _x_temp = _xi, copy.deepcopy(_x)
                     proposed_xi = _xi_0 + self.trans_kern(loc=self.loc, scale=self.scale)
                     _x_temp[idx2] = proposed_xi
 

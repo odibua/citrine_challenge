@@ -1,5 +1,8 @@
+ipdb
+matplotlib
 numpy
-typing
 scipy
 smt
-ipdb
+typing
+
+
