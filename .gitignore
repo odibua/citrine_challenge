@@ -1,3 +1,5 @@
 venv
 .idea/
 __pycache__/
+toy_output.txt
+toy_output.txt0

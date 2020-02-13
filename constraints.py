@@ -1,4 +1,5 @@
 ####################Python packages#####################
+import numpy as np
 from typing import List
 
 class Constraint():
@@ -46,7 +47,18 @@ class Constraint():
                  return False
         return eval(expr)
 
-    def eval_constraints(self, x: np.Array[float]) -> np.Array[float]:
+    def apply_list(self, x: np.ndarray):
+        """
+        Apply the constraints to a vector, returning list of booleans
+
+        :param x: list or array on which to evaluate the constraints
+        """
+        bool_list = []
+        for expr in self.exprs:
+            bool_list.append(eval(expr))
+        return bool_list
+
+    def eval_constraints(self, x: np.ndarray) -> np.ndarray:
         """
         Evaluate g(x) for each g(x) >= 0 constraint, returning the values of every evaluation as a list
         :param x: list on which to evaluate g(x)
@@ -54,5 +66,5 @@ class Constraint():
         """
         results = []
         for num_expr in self.num_exprs:
-            results.append(eval(num_expr))
+            results.append(-eval(num_expr))
         return np.array(results)

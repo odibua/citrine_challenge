@@ -1,10 +1,12 @@
 ####################Python packages#####################
 import numpy as np
 from random import choices
+from typing import Callable, List
+
+##################Third Party Packages###################
 from scipy import optimize
 from scipy.stats import norm
 from smt.sampling_methods import LHS
-from typing import Callable, List
 
 
 class ConstrainedSCMC:
@@ -69,8 +71,8 @@ class ConstrainedSCMC:
         """
         def calc_wn(tau_t):
             for idx, _x in enumerate(x):
-                num = np.sum(np.log(norm_cdf(tau_t*constraints(_x), scale=scale)))
-                den = np.sum(np.log(norm_cdf(tau_t_1*constraints(_x), scale=scale)))
+                num = np.sum(np.log(norm_cdf(-tau_t*constraints(_x), scale=scale)))
+                den = np.sum(np.log(norm_cdf(-tau_t_1*constraints(_x), scale=scale)))
                 w[idx] = num - den
             return np.exp(w)
         return calc_wn
@@ -112,9 +114,12 @@ class ConstrainedSCMC:
     def get_pi(self) -> Callable:
         def target_distrib(tau_t: float, constraints: List[Callable], scale: float, norm_cdf: Callable) -> Callable:
             def pi(x: np.ndarray) -> float:
-                return np.exp(np.sum(np.log(norm_cdf(tau_t * constraints(x), scale=scale))))
+                return np.exp(np.sum(np.log(norm_cdf(-tau_t * constraints(x), scale=scale))))
             return pi
         return target_distrib(self.tau_t, self.constraints, scale=self.scale, norm_cdf=self.norm_cdf)
+
+    def get_x(self):
+        return self.x
 
 
 

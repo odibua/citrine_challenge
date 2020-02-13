@@ -1,14 +1,16 @@
 ####################Python packages#####################
 import copy
 import numpy as np
-from scipy.stats import norm, uniform
 from typing import Callable
+
+##################Third Party Packages###################
+from scipy.stats import norm, uniform
 
 norm_rvs = norm.rvs
 norm_pdf = norm.pdf
 
 class MetropolisHastings:
-    def __init__(self, x: np.ndarray, pi: Callable,  T: int = 1, proposal_distrib: Callable = norm_pdf, trans_kern: Callable = norm_rvs, loc: float = 0.0, scale: float = 1.0):
+    def __init__(self, x: np.ndarray, pi: Callable,  T: int = 10, proposal_distrib: Callable = norm_pdf, trans_kern: Callable = norm_rvs, loc: float = 0.0, scale: float = 1.0):
         """
         Initialize basic parameters used for metropolis hastings
         :param x: Initial vector from which new samples will be generated
