@@ -17,7 +17,7 @@ def get_accuracy(x: List[np.ndarray], constraints: Callable) -> float:
     return n_valid / n
 
 
-def get_bounds(x0: np.ndarray, constraint_bool: Callable, scale: int = 2) -> np.ndarray:
+def get_bounds(x0: np.ndarray, constraint_bool: Callable, scale: int = 1.5) -> np.ndarray:
     """
     Returns bounds that violate all of the constraints to insure that we are sampling
     from a domain that contains the full constrained region
@@ -29,10 +29,9 @@ def get_bounds(x0: np.ndarray, constraint_bool: Callable, scale: int = 2) -> np.
     bound = np.zeros((x0.shape[0], 2))
     max_val = max(max(np.abs(x0 - scale*x0)), max(np.abs(x0 + scale*x0)))
     bound[:, 0], bound[:, 1] = -max_val, max_val
-
     while not bound_violated:
-        low_bool, up_bool = constraint_bool(bound[:,0]), constraint_bool(bound[:,1])
-        if sum(low_bool) == len(low_bool) and sum(up_bool) == len(up_bool):
+        low_bool, up_bool = constraint_bool(bound[:, 0]), constraint_bool(bound[:, 1])
+        if sum(low_bool) < len(low_bool) and sum(up_bool) < len(up_bool):
             return bound
 
         bound[:, 0] = bound[:, 0] - scale*max_val

@@ -50,7 +50,7 @@ class RunSMC:
             scmc.init_weights(N)
             x, pi = scmc.get_x(), scmc.get_pi()
             mh = MetropolisHastings(x, pi)
-            scmc.x = mh.gibbs_type()
+            scmc.x = mh.gibbs_type(t+1)
             t = t+1
         self.x = scmc.x
 
