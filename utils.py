@@ -11,10 +11,13 @@ def get_accuracy(x: List[np.ndarray], constraints: Callable) -> float:
     :return: accuracy
     """
     n, n_valid = x.shape[0], 0.0
-
+    x_valid = []
     for _x in x:
-        n_valid = n_valid + int(constraints(_x))
-    return n_valid / n
+        valid = constraints(_x)
+        n_valid = n_valid + int(valid)
+        if valid:
+            x_valid.append(_x)
+    return n_valid / n, np.array(x_valid)
 
 
 def get_bounds(x0: np.ndarray, constraint_bool: Callable, scale: int = 1e0, thresh_ratio: float = 1.25) -> np.ndarray:

@@ -47,14 +47,19 @@ def main():
     bounds = get_bounds(x0, constraint_bools)
 
     # Find valid uniformly distributed samples with constrained SMC
-    run = RunSMC(N=N, bounds=bounds, type="constrained_smc", tau_T=1e7, constraints=constraints)
+    N_star = int(N*1.1)
+    run = RunSMC(N=N_star, bounds=bounds, type="constrained_smc", tau_T=1e7, constraints=constraints)
     x, x0 = run.get_x(), run.get_x0()
 
     # Evaluate validity. uniqueness, and spread of results
-    acc = get_accuracy(x, constraint_bool)
+    # Subsample result
+    acc, x_valid = get_accuracy(x, constraint_bool)
+    idx_x, idx_x_valid = np.arange(x.shape[0]), np.arange(x_valid.shape[0])
+    x = x_valid[np.random.choice(idx_x_valid, N, replace=False)] if x_valid.shape[0] >= N else \
+        x[np.random.choice(idx_x, N, replace=False)]
     std = np.std(x, axis=0)
     uniq_nums = np.unique(x, axis=0).shape[0]
-
+    
     print('accuracy: {acc} std: {std} unique candidates: {uniq}'.format(acc=acc, std=std, uniq=uniq_nums))
 
     # Save output and plot if 2D and plot_bool
