@@ -1,5 +1,6 @@
 ipdb
 matplotlib
+numba
 numpy
 scipy
 smt

@@ -25,7 +25,7 @@ class Constraint():
             if lines[i][0] == "#":
                 continue
             self.exprs.append(compile(lines[i], "<string>", "eval"))
-            self.num_exprs.append(compile(lines[i].strip(" >= 0 \n"), "<string>", "eval"))
+            self.num_exprs.append(compile(lines[i].split(sep=" >=")[0], "<string>", "eval"))
         return
 
     def get_example(self):
@@ -53,18 +53,15 @@ class Constraint():
 
         :param x: list or array on which to evaluate the constraints
         """
-        bool_list = []
-        for expr in self.exprs:
-            bool_list.append(eval(expr))
+        bool_list = list(map(eval, self.exprs))
         return bool_list
 
     def eval_constraints(self, x: np.ndarray) -> np.ndarray:
         """
         Evaluate g(x) for each g(x) >= 0 constraint, returning the values of every evaluation as a list
+        
         :param x: list on which to evaluate g(x)
         :return: list of g(x)
         """
-        results = []
-        for num_expr in self.num_exprs:
-            results.append(-eval(num_expr))
-        return np.array(results)
+        results = list(map(eval, self.num_exprs))
+        return -np.array(results)
