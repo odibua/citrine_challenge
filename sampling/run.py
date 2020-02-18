@@ -5,36 +5,36 @@ import copy
 
 ##################Third Party Packages###################
 from sampling.metropolis_hastings import MetropolisHastings
-from sampling.scmc import ConstrainedSCMC
+from sampling.smc import ConstrainedSMC
 
 
 class RunSMC:
     def __init__(self, N: int, bounds: np.ndarray, type: str, tau_T: float = None, constraints: List[Callable] = None, t: int = 10):
         """
-        Run SCMC sampling methods based on user input
+        Run SMC sampling methods based on user input
         
         :param N: Number of points to be sampled
         :param bounds: Bounds of sampling region
-        :param type: Type of SCMC to be run
-        :param tau_T: Stopping condition for constrained scmc
+        :param type: Type of SMC to be run
+        :param tau_T: Stopping condition for constrained SMC
         :param constraints: List constraints that define valid regions of space
         """
         self.t = t
         self.x0, self.x, self.scale = None, None, None
         types = ["constrained_smc"]
         if type not in types:
-            raise ValueError('Invalid SCMC type try one of {t}.'.format(t=types))
+            raise ValueError('Invalid SMC type try one of {t}.'.format(t=types))
 
         if type == "constrained_smc":
             if not constraints:
-                raise ValueError('No constraints specified for Constrained SCMC. Specify constraints as list of functions')
+                raise ValueError('No constraints specified for Constrained SMC. Specify constraints as list of functions')
             if not tau_T:
                 raise ValueError('No constraint parameter value tau_T specified')
-            self.run_scmc(N, bounds, constraints, tau_T)
+            self.run_SMC(N, bounds, constraints, tau_T)
 
-    def run_scmc(self, N: int, bounds: np.ndarray, constraints: Callable, tau_T: float):
+    def run_SMC(self, N: int, bounds: np.ndarray, constraints: Callable, tau_T: float):
         """
-        Run SCMC for given bounds and constraints
+        Run SMC for given bounds and constraints
         
         :param N: Number of samples taken
         :param bounds: Boundary of domain to be sampled
@@ -42,7 +42,7 @@ class RunSMC:
         :param tau_T: Stopping value of tau_t
         :return:
         """
-        smc = ConstrainedSCMC(N, bounds, constraints, tau_T)
+        smc = ConstrainedSMC(N, bounds, constraints, tau_T)
         t = 0
         self.x0 = copy.deepcopy(smc.x)
         self.scale = np.std(self.x0, axis=0)

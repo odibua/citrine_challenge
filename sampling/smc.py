@@ -10,11 +10,11 @@ from scipy.stats import norm
 from smt.sampling_methods import LHS
 
 
-class ConstrainedSCMC:
+class ConstrainedSMC:
     def __init__(self, N: int, bounds: np.ndarray, constraints: List[Callable], tau_T: float):
         """
         Initialize scmc class with relevant parameters and constraints. Implemented as
-        detailed in S. Golchi et al, "Monte Carlo based Designs for Constrained Domains" 
+        detailed by S. Golchi et al in"Monte Carlo based Designs for Constrained Domains" 
         (https://arxiv.org/pdf/1512.07328.pdf)
         :param N: Number of samples to be generated
         :param bounds: Lower and upper bounds of hypercube in each dimension
