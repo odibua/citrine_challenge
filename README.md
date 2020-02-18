@@ -8,6 +8,7 @@ To install and run this sampling method the following are required.
 
 ## Installation Instructions #
 Below are steps to install this API:
+1. `sudo pip3 install --upgrade pip setuptools wheel`
 1. `git clone git@github.com:odibua/citrine_challenge.git && cd citrine_challenge`
 1. `pip3 install -r requirements.txt`
 1. `chmod +x sampler.sh`
